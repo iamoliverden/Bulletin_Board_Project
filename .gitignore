@@ -1,8 +1,5 @@
 venv/
 
-Bulletin_Board_Project/Bulletin_Board_Project/my_passwords.py
-
-# ignore .idea folder
-
 .idea/
 
+/Bulletin_Board_Project/passwords/
