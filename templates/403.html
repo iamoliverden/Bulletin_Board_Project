@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block content %}
+<main>
+    <h2>Welcome to Game Bulletin Board</h2>
+    <p>You need to log in to use the service. <a href="{% url 'login' %}">Click here to log in</a>.</p>
+    <div id="ads">
+        {% for ad in ads %}
+        <div class="ad-block">
+            <h3>{{ ad.title }}</h3>
+            <p>{{ ad.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

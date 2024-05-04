@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+{% block content %}
+<main>
+    <h2>Welcome, {{ user.username }}</h2>
+    <input type="text" id="search" placeholder="Search ads...">
+    <div id="ads">
+        {% for ad in ads %}
+        <div class="ad-block">
+            <h3>{{ ad.title }}</h3>
+            <p>{{ ad.content }}</p>
+            <button class="react-button" data-ad-id="{{ ad.id }}">React</button>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

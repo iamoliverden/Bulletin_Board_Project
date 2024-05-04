@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+SITE_ID = 1
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -71,8 +73,7 @@ ROOT_URLCONF = 'Bulletin_Board_Project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates', os.path.join(BASE_DIR, 'Bulletin_Board_app/static')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,6 +85,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'Bulletin_Board_Project.wsgi.application'
 
@@ -144,7 +146,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
-LOGIN_REDIRECT_URL = '/api/userads/'
+LOGIN_REDIRECT_URL = 'landing_page_registered'
 
 
 AUTHENTICATION_BACKENDS = [

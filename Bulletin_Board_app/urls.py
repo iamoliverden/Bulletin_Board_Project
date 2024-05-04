@@ -14,4 +14,10 @@ router.register(r'adreactions', views.AdReactionsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('landing/', views.landing_page_registered, name='landing_page_registered'),
+    path('non_registered/', views.landing_page_non_registered, name='landing_page_non_registered'),
+    path('my_account/', views.my_account, name='my_account'),
+    path('reactions/<int:ad_id>/', views.reactions, name='reactions'),
+    path('login/', views.login_view, name='login'),  # login view
+    path('contact_us/', views.contact, name='contact_us'),
 ]
