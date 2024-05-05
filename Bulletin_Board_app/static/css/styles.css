@@ -26,3 +26,26 @@ footer {
     width: 100%;
     padding: 10px 0;
 }
+
+form {
+    margin: 20px 0;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="date"],
+form input[type="file"],
+form select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #009688;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

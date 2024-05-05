@@ -40,3 +40,4 @@ class AdReactions(models.Model):
     reacted_user = models.ForeignKey(User, on_delete=models.CASCADE)
     reaction_time = models.DateTimeField(default=timezone.now)
     accepted_status = models.BooleanField(default=False)
+

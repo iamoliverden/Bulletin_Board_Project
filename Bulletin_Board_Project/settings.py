@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 
 import os
+
+from django.template.context_processors import media
+
 from Bulletin_Board_Project.passwords.my_passwords import EmailPassword_Google, SecretKey
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "django_apscheduler",
     'rest_framework',
+    'django-crispy-forms',
 ]
 
 SITE_ID = 1
@@ -153,3 +157,5 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

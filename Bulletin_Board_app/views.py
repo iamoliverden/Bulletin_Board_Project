@@ -6,6 +6,10 @@ from rest_framework import viewsets
 from .models import Country, GameGenre, GamingPlatform, UserProfile, AdType, UserAds, AdReactions
 from .serializers import CountrySerializer, GameGenreSerializer, GamingPlatformSerializer, UserProfileSerializer, AdTypeSerializer, UserAdsSerializer, AdReactionsSerializer
 from django.shortcuts import render
+from .forms import UserForm, UserProfileForm
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -63,3 +67,29 @@ def login_view(request):
 
 def contact(request):
     return render(request, 'contact_us.html')
+
+class UserProfileCreateView(CreateView):
+    model = UserProfile
+    form_class = UserProfileForm
+    template_name = 'create_profile.html'
+    second_form_class = UserForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'form2' not in context:
+            context['form2'] = self.second_form_class(self.request.GET)
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        form2 = self.second_form_class(self.request.POST)
+        if form2.is_valid():
+            user = form2.save()
+            self.object.user = user
+            self.object.save()
+            return super().form_valid(form)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        return reverse_lazy('profile_detail', kwargs={'pk': self.object.pk})
