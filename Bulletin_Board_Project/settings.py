@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "django_apscheduler",
     'rest_framework',
-    'django-crispy-forms',
+    'crispy_forms'
 ]
 
 SITE_ID = 1
@@ -159,3 +159,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

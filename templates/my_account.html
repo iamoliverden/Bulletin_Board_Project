@@ -1,18 +1,15 @@
-{% extends "index.html" %}
+<!-- my_account.html -->
+{% extends 'index.html' %}
+
 {% block content %}
-<main>
-    <h2>My Account</h2>
-    <div id="my-ads">
-        {% for ad in my_ads %}
-        <div class="ad-block">
-            <h3>{{ ad.title }}</h3>
-            <p>{{ ad.content }}</p>
-            <a href="{% url 'edit_ad' ad.id %}">Edit</a>
-            <a href="{% url 'delete_ad' ad.id %}">Delete</a>
-            <a href="{% url 'reactions' ad.id %}">Reactions ({{ ad.reactions.count }})</a>
-        </div>
-        {% endfor %}
-    </div>
-    <a href="{% url 'create_ad' %}">Create New Ad</a>
-</main>
+  <h2>My Account</h2>
+  <!-- Display user profile details -->
+  <p>Username: {{ user_profile.user.username }}</p>
+  <!-- Add more fields as needed -->
+
+  <!-- Links to other pages -->
+  <a href="{% url 'edit_profile' %}">Edit Profile</a>
+  <a href="{% url 'delete_profile' %}">Delete Profile</a>
+  <a href="{% url 'ads' %}">Ads</a>
+  <a href="{% url 'reactions' ad_id=my_ads.first.id %}">Reactions</a>  <!-- Link to reactions of the first ad -->
 {% endblock %}

@@ -1,15 +1,12 @@
-{% extends "index.html" %}
+<!-- reactions.html -->
+{% extends 'index.html' %}
+
 {% block content %}
-<main>
-    <h2>Reactions</h2>
-    <div id="reactions">
-        {% for reaction in reactions %}
-        <div class="reaction-block">
-            <p>{{ reaction.user.username }} reacted to your ad "{{ reaction.ad.title }}"</p>
-            <button class="accept-button" data-reaction-id="{{ reaction.id }}">Accept</button>
-            <button class="reject-button" data-reaction-id="{{ reaction.id }}">Reject</button>
-        </div>
-        {% endfor %}
-    </div>
-</main>
+  <h2>Reactions</h2>
+  <!-- Display reactions -->
+  {% for reaction in reactions %}
+    <p>{{ reaction.reacted_user.username }} reacted at {{ reaction.reaction_time }}</p>
+  {% empty %}
+    <p>No reactions yet.</p>
+  {% endfor %}
 {% endblock %}
