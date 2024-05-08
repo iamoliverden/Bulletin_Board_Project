@@ -43,12 +43,12 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
 
-class AdType(models.Model):
+class AdCategory(models.Model):
     type_name = models.CharField(max_length=100)
 
 class UserAds(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ad_type = models.ForeignKey(AdType, on_delete=models.CASCADE)
+    ad_type = models.ForeignKey(AdCategory, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
 class AdReactions(models.Model):
@@ -56,6 +56,7 @@ class AdReactions(models.Model):
     reacted_user = models.ForeignKey(User, on_delete=models.CASCADE)
     reaction_time = models.DateTimeField(default=timezone.now)
     accepted_status = models.BooleanField(default=False)
+    reaction_text = models.TextField(blank=True, null=True, max_length=500)
 
 
 class SocialMedia(models.Model):
@@ -65,8 +66,8 @@ class SocialMedia(models.Model):
         return self.name
 
 class UserSocialMedia(models.Model):
-    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    social_media = models.ForeignKey(SocialMedia, on_delete=models.CASCADE)
+    profile_key = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    social_media_key = models.ForeignKey(SocialMedia, on_delete=models.CASCADE)
     handle = models.CharField(max_length=100)
 
     def __str__(self):

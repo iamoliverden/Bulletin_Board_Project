@@ -1,4 +1,5 @@
 <!-- my_account.html -->
+
 {% extends 'index.html' %}
 
 {% block content %}
@@ -11,5 +12,5 @@
   <a href="{% url 'edit_profile' %}">Edit Profile</a>
   <a href="{% url 'delete_profile' %}">Delete Profile</a>
   <a href="{% url 'ads' %}">Ads</a>
-  <a href="{% url 'reactions' ad_id=my_ads.first.id %}">Reactions</a>  <!-- Link to reactions of the first ad -->
+  <a href="{% url 'reactions' %}">Reactions</a>  <!-- Link to reactions page -->
 {% endblock %}

@@ -8,7 +8,10 @@
         <input type="text" id="username" name="username"><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password"><br>
+         <br>
         <input type="submit" value="Login">
+        <br>
     </form>
+    <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
 </main>
 {% endblock %}

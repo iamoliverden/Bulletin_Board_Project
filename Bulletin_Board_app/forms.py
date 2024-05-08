@@ -5,7 +5,8 @@ from .models import *
 class UserSocialMediaForm(forms.ModelForm):
     class Meta:
         model = UserSocialMedia
-        fields = ('social_media', 'handle')
+        fields = ('social_media_key', 'handle')
+
 class UserProfileForm(forms.ModelForm):
     social_media_forms = forms.inlineformset_factory(UserProfile, UserSocialMedia, form=UserSocialMediaForm, extra=1)
     date_of_birth = forms.DateField(
