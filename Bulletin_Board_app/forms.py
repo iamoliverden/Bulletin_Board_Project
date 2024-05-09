@@ -8,7 +8,7 @@ class UserSocialMediaForm(forms.ModelForm):
         fields = ('social_media_key', 'handle')
 
 class UserProfileForm(forms.ModelForm):
-    social_media_forms = forms.inlineformset_factory(UserProfile, UserSocialMedia, form=UserSocialMediaForm, extra=1)
+    social_media_forms = forms.inlineformset_factory(UserProfile, UserSocialMedia, form=UserSocialMediaForm, extra=3)
     date_of_birth = forms.DateField(
         widget=forms.DateInput(format='%Y-%m-%d', attrs={'placeholder': 'YYYY-MM-DD'}),
         input_formats=('%Y-%m-%d',),

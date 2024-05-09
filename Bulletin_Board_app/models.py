@@ -50,6 +50,9 @@ class UserAds(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ad_type = models.ForeignKey(AdCategory, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
+    picture = models.ImageField(upload_to='ad_pictures/', blank=True, null=True)  # new field for the picture
+    video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
+    ad_text = models.TextField(max_length=500, default='')
 
 class AdReactions(models.Model):
     user_ad = models.ForeignKey(UserAds, on_delete=models.CASCADE)

@@ -15,6 +15,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import UserSocialMediaForm
 from functools import wraps
+from django.urls import reverse
 
 def profile_required(view_func):
     @wraps(view_func)
@@ -74,14 +75,30 @@ def contact(request):
 class UserProfileCreateView(CreateView):
     model = UserProfile
     form_class = UserProfileForm
-    template_name = 'complete_profile.html'
+    template_name = 'create_profile.html'
+
+    def get_context_data(self, **kwargs):
+        data = super(UserProfileCreateView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['social_media_forms'] = UserProfileForm.social_media_forms(self.request.POST, instance=self.object)
+        else:
+            data['social_media_forms'] = UserProfileForm.social_media_forms(instance=self.object)
+        return data
 
     def form_valid(self, form):
-        form.instance.user = self.request.user  # set user to the currently logged in user
-        return super().form_valid(form)
+        context = self.get_context_data()
+        social_media_forms = context['social_media_forms']
+        if social_media_forms.is_valid():
+            form.instance.user = self.request.user  # set user to the currently logged in user
+            self.object = form.save()
+            social_media_forms.instance = self.object
+            social_media_forms.save()
+            return super().form_valid(form)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
-        return reverse_lazy('my_account')  # assuming 'my_account' is the name of your my account view
+        return reverse('my_account')
 
 class SignUpView(generic.CreateView):
     form_class = UserCreationForm
@@ -109,7 +126,7 @@ def reactions(request, ad_id):
 def edit_profile(request):
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=request.user.userprofile)
-        social_media_forms = UserSocialMediaForm(request.POST, instance=request.user.userprofile)
+        social_media_forms = UserProfileForm.social_media_forms(request.POST, instance=request.user.userprofile)
         if form.is_valid() and social_media_forms.is_valid():
             form.save()
             social_media_forms.save()
@@ -119,8 +136,9 @@ def edit_profile(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = UserProfileForm(instance=request.user.userprofile)
-        social_media_forms = UserSocialMediaForm(instance=request.user.userprofile)
+        social_media_forms = UserProfileForm.social_media_forms(instance=request.user.userprofile)
     return render(request, 'edit_profile.html', {'form': form, 'social_media_forms': social_media_forms})
+
 
 # Delete Profile Page
 @login_required

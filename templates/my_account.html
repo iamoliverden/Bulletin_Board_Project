@@ -1,13 +1,27 @@
-<!-- my_account.html -->
-
 {% extends 'index.html' %}
+{% load static %}
 
 {% block content %}
   <h2>My Account</h2>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
   <!-- Display user profile details -->
   <p>Username: {{ user_profile.user.username }}</p>
-  <!-- Add more fields as needed -->
-
+  <p>Date of Birth: {{ user_profile.date_of_birth }}</p>
+  <p>Mobile Number: {{ user_profile.mobile_number }}</p>
+  <p>Country: {{ user_profile.country }}</p>
+  <p>Favorite Game Genre: {{ user_profile.favorite_game_genre }}</p>
+  <p>Gaming Platform: {{ user_profile.gaming_platform }}</p>
+  <p>Biography: {{ user_profile.biography }}</p>
+  <p>Communication Preference: {{ user_profile.communication_preference }}</p>
+  {% if user_profile.profile_picture %}
+    <img src="{{ user_profile.profile_picture.url }}" alt="" style="position: absolute; top: 0; right: 0;">
+  {% else %}
+    <p>No profile picture found.</p>
+  {% endif %}
+  <!-- Display social media handles -->
+  {% for social_media in user_profile.usersocialmedia_set.all %}
+    <p>{{ social_media.social_media_key.name }}: {{ social_media.handle }}</p>
+  {% endfor %}
   <!-- Links to other pages -->
   <a href="{% url 'edit_profile' %}">Edit Profile</a>
   <a href="{% url 'delete_profile' %}">Delete Profile</a>

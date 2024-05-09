@@ -2,10 +2,13 @@
 
 {% block content %}
   <h2>Edit Profile</h2>
-  <form method="post">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    {{ social_media_forms.as_p }}
-    <button type="submit">Update</button>
+    {{ social_media_forms.management_form }}
+    {% for form in social_media_forms %}
+      {{ form.as_p }}
+    {% endfor %}
+    <button type="submit">Update Profile</button>
   </form>
 {% endblock %}
