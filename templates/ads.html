@@ -1,11 +1,25 @@
 {% extends 'index.html' %}
+{% load static %}
 
 {% block content %}
   <h2>My Ads</h2>
   {% for ad in user_ads %}
-    <div>
-      <h3>{{ ad.ad_type.type_name }}</h3> <!-- Replace with actual field from your AdCategory model -->
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+      <h3 style="display: inline;">{{ ad.title }}</h3>
+      <a style="margin-left:10px;" href="{% url 'edit_ad' ad.id %}">Edit</a>
+      <a style="margin-left:10px;" href="{% url 'delete_ad' ad.id %}">Delete</a>
       <p>Created at: {{ ad.created_at }}</p>
+      <p>Ad text: {{ ad.ad_text }}</p>
+      <p>Number of reactions: {{ ad.reactions.count }}</p>
     </div>
+  {% empty %}
+    <p>No ads yet.</p>
   {% endfor %}
+
+<div style="text-align:center; margin-top:20px;">
+  <form action="{% url 'create_ad' %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create a new ad" class="btn btn-primary" />
+  </form>
+</div>
 {% endblock %}

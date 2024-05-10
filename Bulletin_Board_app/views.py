@@ -152,17 +152,107 @@ def delete_profile(request):
         return redirect('landing_page_non_registered')
     return render(request, 'delete_profile.html')
 
-# Ads Page
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import *
+
 @login_required
 @profile_required
-def ads(request):
-    user_ads = UserAds.objects.filter(user=request.user).order_by('-created_at')
+def ads_view(request):
+    user_ads = UserAds.objects.filter(user=request.user)
     return render(request, 'ads.html', {'user_ads': user_ads})
 
-# Reactions Page
 @login_required
 @profile_required
-def reactions(request):
-    user_reactions = AdReactions.objects.filter(reacted_user=request.user)
-    return render(request, 'reactions.html', {'user_reactions': user_reactions})
+def create_ad_view(request):
+    if request.method == 'POST':
+        form = UserAdsForm(request.POST)
+        if form.is_valid():
+            ad = form.save(commit=False)
+            ad.user = request.user
+            ad.save()
+            return redirect('ads')
+    else:
+        form = UserAdsForm()
+    return render(request, 'create_ad.html', {'form': form})
 
+@login_required
+@profile_required
+def edit_ad_view(request, ad_id):
+    ad = UserAds.objects.get(id=ad_id, user=request.user)
+    if request.method == 'POST':
+        form = UserAdsForm(request.POST, instance=ad)
+        if form.is_valid():
+            form.save()
+            return redirect('ads')
+    else:
+        form = UserAdsForm(instance=ad)
+    return render(request, 'edit_ad.html', {'form': form})
+
+@login_required
+@profile_required
+def delete_ad_view(request, ad_id):
+    ad = UserAds.objects.get(id=ad_id, user=request.user)
+    if request.method == 'POST':
+        ad.delete()
+        return redirect('ads')
+    return render(request, 'delete_ad.html', {'ad': ad})
+
+
+@login_required
+@profile_required
+def received_reactions(request):
+    user_ads = UserAds.objects.filter(user=request.user)
+    reactions = AdReactions.objects.filter(user_ad__in=user_ads)
+    return render(request, 'received_reactions.html', {'reactions': reactions})
+
+@login_required
+@profile_required
+def sent_reactions(request):
+    reactions = AdReactions.objects.filter(reacted_user=request.user)
+    return render(request, 'sent_reactions.html', {'reactions': reactions})
+
+@login_required
+@profile_required
+def update_reaction(request, reaction_id):
+    reaction = AdReactions.objects.get(id=reaction_id)
+    if 'accept' in request.POST:
+        reaction.accepted_status = True
+        reaction.rejected_status = False
+    elif 'reject' in request.POST:
+        reaction.accepted_status = False
+        reaction.rejected_status = True
+    reaction.save()
+    return redirect('received_reactions')
+
+
+# views.py
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)
+    return redirect('landing_page_non_registered')  # or your desired redirect page
+
+
+@login_required
+@profile_required
+def accept_ad(request, ad_id):
+    if request.method == 'POST':
+        form = AdReactionForm(request.POST)
+        if form.is_valid():
+            reaction = form.save(commit=False)
+            reaction.user_ad = UserAds.objects.get(id=ad_id)
+            reaction.reacted_user = request.user
+            reaction.accepted_status = True
+            reaction.rejected_status = False
+            reaction.save()
+            return redirect('landing')
+    else:
+        form = AdReactionForm()
+    return render(request, 'create_reaction.html', {'form': form})
+
+@login_required
+@profile_required
+def reject_ad(request, ad_id):
+    AdReactions.objects.create(user_ad=UserAds.objects.get(id=ad_id), reacted_user=request.user, accepted_status=False, rejected_status=True)
+    return redirect('landing')

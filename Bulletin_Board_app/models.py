@@ -46,6 +46,9 @@ class UserProfile(models.Model):
 class AdCategory(models.Model):
     type_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.type_name
+
 class UserAds(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ad_type = models.ForeignKey(AdCategory, on_delete=models.CASCADE)
@@ -53,12 +56,14 @@ class UserAds(models.Model):
     picture = models.ImageField(upload_to='ad_pictures/', blank=True, null=True)  # new field for the picture
     video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
     ad_text = models.TextField(max_length=500, default='')
+    title = models.CharField(max_length=200, default='')
 
 class AdReactions(models.Model):
     user_ad = models.ForeignKey(UserAds, on_delete=models.CASCADE)
     reacted_user = models.ForeignKey(User, on_delete=models.CASCADE)
     reaction_time = models.DateTimeField(default=timezone.now)
     accepted_status = models.BooleanField(default=False)
+    rejected_status = models.BooleanField(default=False)
     reaction_text = models.TextField(blank=True, null=True, max_length=500)
 
 

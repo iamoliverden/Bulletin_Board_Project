@@ -24,3 +24,22 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('date_of_birth', 'mobile_number', 'country', 'favorite_game_genre', 'gaming_platform', 'privacy_consent', 'news_digest', 'biography', 'communication_preference', 'profile_picture')
+
+
+class UserAdsForm(forms.ModelForm):
+    class Meta:
+        model = UserAds
+        fields = ['ad_type', 'picture', 'video_link', 'ad_text', 'title']
+
+    def __init__(self, *args, **kwargs):
+        super(UserAdsForm, self).__init__(*args, **kwargs)
+        self.fields['ad_type'].queryset = AdCategory.objects.all()
+
+
+# forms.py
+...
+class AdReactionForm(forms.ModelForm):
+    class Meta:
+        model = AdReactions
+        fields = ['reaction_text']
+...

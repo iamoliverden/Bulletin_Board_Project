@@ -1,14 +1,21 @@
+<!-- 403.html -->
 {% extends "index.html" %}
+{% load static %}
+
 {% block content %}
 <main>
     <h2>Welcome to Game Bulletin Board</h2>
     <p>You need to log in to use the service. <a href="{% url 'login' %}">Click here to log in</a>.</p>
     <div id="ads">
         {% for ad in ads %}
-        <div class="ad-block">
-            <h3>{{ ad.title }}</h3>
-            <p>{{ ad.content }}</p>
+        <div style="border:1px solid black; margin:10px; padding:10px;">
+            <h3 style="display: inline;">{{ ad.title }}</h3>
+            <p>Created at: {{ ad.created_at }}</p>
+            <p>Ad text: {{ ad.ad_text }}</p>
+            <p>Number of reactions: {{ ad.reactions.count }}</p>
         </div>
+        {% empty %}
+        <p>No ads yet.</p>
         {% endfor %}
     </div>
 </main>

@@ -1,0 +1,12 @@
+<!-- sent_reactions.html -->
+{% extends 'index.html' %}
+{% load static %}
+
+
+{% block content %}
+  <h2>Sent Reactions</h2>
+  {% for reaction in reactions %}
+    <h3>{{ reaction.user_ad.title }}</h3>
+    <p>{{ reaction.reaction_text }}</p>
+  {% endfor %}
+{% endblock %}
