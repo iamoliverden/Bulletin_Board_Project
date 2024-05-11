@@ -6,6 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
   <!-- Display user profile details -->
   <p>Username: {{ user_profile.user.username }}</p>
+  <p>Email: {{ user_profile.user.email }}</p>
   <p>Date of Birth: {{ user_profile.date_of_birth }}</p>
   <p>Mobile Number: {{ user_profile.mobile_number }}</p>
   <p>Country: {{ user_profile.country }}</p>
@@ -26,7 +27,7 @@
   <a href="{% url 'edit_profile' %}">Edit Profile</a>
   <a href="{% url 'delete_profile' %}">Delete Profile</a>
   <a href="{% url 'ads' %}">My Ads</a>
-  <a href="{% url 'landing_page_registered' %}">Search Ads</a>
+  <a href="{% url 'landing_page_registered' %}">View All Ads</a>
   <a href="{% url 'received_reactions' %}">Received Reactions</a>
   <a href="{% url 'sent_reactions' %}">Sent Reactions</a>
   <a href="{% url 'logout' %}">Logout</a>

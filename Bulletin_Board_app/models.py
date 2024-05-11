@@ -65,6 +65,7 @@ class AdReactions(models.Model):
     accepted_status = models.BooleanField(default=False)
     rejected_status = models.BooleanField(default=False)
     reaction_text = models.TextField(blank=True, null=True, max_length=500)
+    reaction_received_status = models.IntegerField(default=0)
 
 
 class SocialMedia(models.Model):

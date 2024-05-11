@@ -29,4 +29,10 @@ urlpatterns = [
     path('received_reactions/', views.received_reactions, name='received_reactions'),
     path('sent_reactions/', views.sent_reactions, name='sent_reactions'),
     path('update_reaction/<int:reaction_id>/', views.update_reaction, name='update_reaction'),
+    path('accept_ad/<int:ad_id>/', views.accept_ad, name='accept_ad'),
+    path('reject_ad/<int:ad_id>/', views.reject_ad, name='reject_ad'),
+    path('delete_reaction/<int:reaction_id>/', views.delete_reaction, name='delete_reaction'),
+    path('accept_reaction/<int:reaction_id>/', views.accept_reaction, name='accept_reaction'),
+    path('ignore_reaction/<int:reaction_id>/', views.ignore_reaction, name='ignore_reaction'),
+
 ]

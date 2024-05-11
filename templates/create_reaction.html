@@ -1,10 +1,8 @@
 <!-- create_reaction.html -->
 {% extends 'index.html' %}
-{% load static %}
-
 {% block content %}
   <h2>Create Reaction</h2>
-  <form method="POST" action="{% url 'accept_ad' ad.id %}">
+  <form method="POST" action="{% url 'accept_ad' ad_id %}">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save Reaction">

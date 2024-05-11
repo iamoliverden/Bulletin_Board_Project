@@ -1,17 +1,37 @@
+<!-- landing.html -->
 {% extends "index.html" %}
 {% block content %}
 <main>
     <h2>Welcome, {{ user.username }}</h2>
-    <input type="text" id="search" placeholder="Search ads...">
-    <div id="ads">
+    <form method="GET" action="{% url 'landing_page_registered' %}">
+        <select name="category">
+            <option value="">--Select Category--</option>
+            {% for category in categories %}
+            <option value="{{ category.type_name }}">{{ category.type_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="date" name="date">
+        <input type="submit" value="Search">
+    </form>
+    <ul id="ads">
         {% for ad in ads %}
-        <div class="ad-block">
-            <h3>{{ ad.title }}</h3>
-            <p>{{ ad.content }}</p>
-            <a href="{% url 'accept_ad' ad.id %}">Accept</a>
-            <a href="{% url 'reject_ad' ad.id %}">Reject</a>
-        </div>
+        <li style="margin-bottom: 20px;">
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <div>
+                    <h3>{{ ad.title }}</h3>
+                    <p>Category: {{ ad.ad_type.type_name }}</p>
+                    <p>Time added: {{ ad.created_at }}</p>
+                    <p>Status: {{ ad.user_reaction_status }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'accept_ad' ad.id %}">Accept</a>
+                    <a href="{% url 'reject_ad' ad.id %}">Reject</a>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <p>No ads yet.</p>
         {% endfor %}
-    </div>
+    </ul>
 </main>
 {% endblock %}

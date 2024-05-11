@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import UserProfile
-from .forms import UserProfileForm
+from .forms import UserProfileForm, CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth import logout
@@ -44,9 +44,29 @@ class AdReactionsViewSet(viewsets.ModelViewSet):
 @login_required
 @profile_required
 def landing_page_registered(request):
-    ads = UserAds.objects.all().order_by('-created_at')
-    return render(request, 'landing.html', {'ads': ads})
+    category = request.GET.get('category', '')
+    date = request.GET.get('date', '')
+    ads = UserAds.objects.exclude(user=request.user)
+    if category:
+        ads = ads.filter(ad_type__type_name=category)
+    if date:
+        ads = ads.filter(created_at__date=date)
+    ads = ads.order_by('-created_at')
+    categories = AdCategory.objects.all()
 
+    # Add reaction statuses to each ad
+    for ad in ads:
+        ad.user_reaction_status = 'Pending'
+        try:
+            reaction = AdReactions.objects.filter(user_ad=ad, reacted_user=request.user).latest('reaction_time')
+            if reaction.accepted_status == 1:
+                ad.user_reaction_status = 'Accepted'
+            elif reaction.rejected_status == 1:
+                ad.user_reaction_status = 'Rejected'
+        except AdReactions.DoesNotExist:
+            pass
+
+    return render(request, 'landing.html', {'ads': ads, 'categories': categories})
 
 # Landing Page for Non-Registered Users
 def landing_page_non_registered(request):
@@ -101,7 +121,7 @@ class UserProfileCreateView(CreateView):
         return reverse('my_account')
 
 class SignUpView(generic.CreateView):
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')  # assuming 'login' is the name of your login view
     template_name = 'signup.html'
 
@@ -246,13 +266,37 @@ def accept_ad(request, ad_id):
             reaction.accepted_status = True
             reaction.rejected_status = False
             reaction.save()
-            return redirect('landing')
+            return redirect('landing_page_registered')
     else:
         form = AdReactionForm()
-    return render(request, 'create_reaction.html', {'form': form})
+    return render(request, 'create_reaction.html', {'form': form, 'ad_id': ad_id})
 
 @login_required
 @profile_required
 def reject_ad(request, ad_id):
     AdReactions.objects.create(user_ad=UserAds.objects.get(id=ad_id), reacted_user=request.user, accepted_status=False, rejected_status=True)
-    return redirect('landing')
+    return redirect('landing_page_registered')
+
+
+@login_required
+@profile_required
+def delete_reaction(request, reaction_id):
+    reaction = AdReactions.objects.get(id=reaction_id, reacted_user=request.user)
+    reaction.delete()
+    return redirect('sent_reactions')
+
+@login_required
+@profile_required
+def accept_reaction(request, reaction_id):
+    reaction = AdReactions.objects.get(id=reaction_id, user_ad__user=request.user)
+    reaction.reaction_received_status = 1
+    reaction.save()
+    return redirect('received_reactions')
+
+@login_required
+@profile_required
+def ignore_reaction(request, reaction_id):
+    reaction = AdReactions.objects.get(id=reaction_id, user_ad__user=request.user)
+    reaction.reaction_received_status = 2
+    reaction.save()
+    return redirect('received_reactions')

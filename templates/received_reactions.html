@@ -1,18 +1,25 @@
-<!-- received_reactions.html -->
 {% extends 'index.html' %}
 {% load static %}
 
-
 {% block content %}
   <h2>Received Reactions</h2>
+  <ul>
   {% for reaction in reactions %}
-    <h3>{{ reaction.user_ad.title }}</h3>
-    <p>{{ reaction.reaction_text }}</p>
-    <form method="POST" action="{% url 'update_reaction' reaction.id %}">
-      {% csrf_token %}
-      <input type="submit" value="Accept" name="accept">
-      <input type="submit" value="Reject" name="reject">
-    </form>
-      <p>Status: {{ reaction.accepted_status|yesno:"Accepted,Rejected" }} / {{ reaction.rejected_status|yesno:"Rejected,Not Rejected" }}</p>
+    {% if reaction.reaction_received_status != 2 %}
+      <li>
+        <p><b>Title: {{ reaction.user_ad.title }}</b></p>
+        <p>Message: {{ reaction.reaction_text }}</p>
+        <p>Country: {{ reaction.reacted_user.userprofile.country }}</p>
+        <p>Favorite Game Genre: {{ reaction.reacted_user.userprofile.favorite_game_genre }}</p>
+        <p>Gaming Platform: {{ reaction.reacted_user.userprofile.gaming_platform }}</p>
+        {% if reaction.reaction_received_status == 1 %}
+          <p>Email: {{ reaction.reacted_user.email }}</p>
+          <p>Phone: {{ reaction.reacted_user.userprofile.mobile_number }}</p>
+        {% endif %}
+        <a href="{% url 'accept_reaction' reaction.id %}">Accept</a>
+        <a href="{% url 'ignore_reaction' reaction.id %}">Ignore</a>
+      </li>
+    {% endif %}
   {% endfor %}
+  </ul>
 {% endblock %}

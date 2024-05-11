@@ -1,12 +1,16 @@
-<!-- sent_reactions.html -->
 {% extends 'index.html' %}
 {% load static %}
 
-
 {% block content %}
   <h2>Sent Reactions</h2>
+  <ul>
   {% for reaction in reactions %}
-    <h3>{{ reaction.user_ad.title }}</h3>
-    <p>{{ reaction.reaction_text }}</p>
+    <li>
+      <p><b>Ad Title: {{ reaction.user_ad.title }}</b></p>
+      <p>My Message: {{ reaction.reaction_text }}</p>
+
+      <a href="{% url 'delete_reaction' reaction.id %}">Delete</a>
+    </li>
   {% endfor %}
+  </ul>
 {% endblock %}
