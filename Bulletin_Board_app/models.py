@@ -2,6 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .utils import send_email_notification
 
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
@@ -42,6 +45,9 @@ class UserProfile(models.Model):
     communication_preference = models.ForeignKey(CommunicationPreference, on_delete=models.CASCADE, default=1)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
+    def delete(self, *args, **kwargs):
+        self.profile_picture.delete(save=False)  # delete profile_picture file
+        super().delete(*args, **kwargs)  # call the original delete method
 
 class AdCategory(models.Model):
     type_name = models.CharField(max_length=100)
@@ -57,6 +63,10 @@ class UserAds(models.Model):
     video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
     ad_text = models.TextField(max_length=500, default='')
     title = models.CharField(max_length=200, default='')
+
+    def delete(self, *args, **kwargs):
+        self.picture.delete(save=False)  # delete picture file
+        super().delete(*args, **kwargs)  # call the original delete method
 
 class AdReactions(models.Model):
     user_ad = models.ForeignKey(UserAds, on_delete=models.CASCADE)
@@ -81,3 +91,23 @@ class UserSocialMedia(models.Model):
 
     def __str__(self):
         return f'{self.user_profile.user.username} - {self.social_media.name}'
+
+
+@receiver(post_save, sender=AdReactions)
+def post_save_adreaction(sender, instance, created, **kwargs):
+    if created:
+        # Send email to ad author
+        ad_author_email = instance.user_ad.user.email
+        subject = 'You received a new reaction'
+        body = f'You received a new reaction to your ad "{instance.user_ad.title}".\n\n' \
+               f'The message is: "{instance.reaction_text}".\n\n' \
+               f'The reaction was from {instance.reacted_user.username} in {instance.reacted_user.userprofile.country}.\n\n' \
+               f'Their preferred method of contact is: {instance.reacted_user.userprofile.communication_preference.preference}.\n\n' \
+               f'You can wait for them to contact you, or you can contact them directly.'
+        send_email_notification(subject, body, ad_author_email)
+    elif instance.accepted_status:
+        # Send email to reaction author
+        reaction_author_email = instance.reacted_user.email
+        subject = 'Your reaction was accepted'
+        body = f'Your reaction to the ad "{instance.user_ad.title}" was accepted. Please contact the ad author using their preferred method of contact: {instance.user_ad.user.userprofile.communication_preference.preference}.'
+        send_email_notification(subject, body, reaction_author_email)

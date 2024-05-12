@@ -16,7 +16,7 @@ import os
 
 from django.template.context_processors import media
 
-from Bulletin_Board_Project.passwords.my_passwords import EmailPassword_Google, SecretKey
+from Bulletin_Board_Project.passwords.my_passwords import EmailPassword_Google, SecretKey, EmailPasswordYandex
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -147,10 +147,12 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    os.path.join(BASE_DIR, "static")
 ]
 
 LOGIN_REDIRECT_URL = 'landing_page_registered'
+
+LOGIN_URL = '/login/'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -159,8 +161,22 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # for production
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # for development
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = f'{EmailPasswordYandex().my_email}'
+EMAIL_HOST_PASSWORD = f'{EmailPasswordYandex().my_password}'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_TIMEOUT = 60
+
+DEFAULT_FROM_EMAIL = f'{EmailPasswordYandex().my_email}'
+
+EMAIL_SUBJECT_PREFIX = '[Game Bulletin Board]'
+SERVER_EMAIL = f'{EmailPasswordYandex().my_email}'

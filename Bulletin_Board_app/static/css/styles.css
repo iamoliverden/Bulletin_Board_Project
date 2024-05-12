@@ -3,7 +3,7 @@ body {
     color: #333;
     background-color: #f5f5f5;
     margin: 0;
-    padding: 0;
+    padding: 0 0 50px 0; /* Adjust the bottom padding to match your footer's height */
 }
 
 header {
@@ -15,6 +15,7 @@ header {
 
 main {
     margin: 15px;
+    padding-bottom: 50px; /* Adjust this to match your footer's height */
 }
 
 footer {
@@ -28,7 +29,8 @@ footer {
 }
 
 form {
-    margin: 20px 0;
+    margin: 20px auto;
+    width: 100%;
 }
 
 form input[type="text"],
@@ -37,7 +39,7 @@ form input[type="date"],
 form input[type="file"],
 form select {
     display: block;
-    width: 100%;
+    width: 15%;
     padding: 10px;
     margin-bottom: 10px;
 }
@@ -48,4 +50,35 @@ form button {
     color: white;
     border: none;
     cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.container {
+    margin-left: 15px;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #009688;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin-left: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #00675b;
 }

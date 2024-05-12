@@ -8,6 +8,7 @@
       <h3 style="display: inline;">{{ ad.title }}</h3>
       <a style="margin-left:10px;" href="{% url 'edit_ad' ad.id %}">Edit</a>
       <a style="margin-left:10px;" href="{% url 'delete_ad' ad.id %}">Delete</a>
+      <a href="{% url 'ad_detail' ad.id %}">Show more</a>
       <p>Created at: {{ ad.created_at }}</p>
       <p>Ad text: {{ ad.ad_text }}</p>
       <p>Number of reactions: {{ ad.reactions.count }}</p>

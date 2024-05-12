@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+import Bulletin_Board_app.views as views
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # replace 'your_app_name' with the name of your Django app
     path('app/', include('Bulletin_Board_app.urls')),
-]
+    path('login/', views.login_view, name='login'),  # login view
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

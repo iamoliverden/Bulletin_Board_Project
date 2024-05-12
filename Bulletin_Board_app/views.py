@@ -16,6 +16,7 @@ from django.contrib import messages
 from .forms import UserSocialMediaForm
 from functools import wraps
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 def profile_required(view_func):
     @wraps(view_func)
@@ -145,7 +146,7 @@ def reactions(request, ad_id):
 @profile_required
 def edit_profile(request):
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user.userprofile)
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user.userprofile)
         social_media_forms = UserProfileForm.social_media_forms(request.POST, instance=request.user.userprofile)
         if form.is_valid() and social_media_forms.is_valid():
             form.save()
@@ -186,7 +187,7 @@ def ads_view(request):
 @profile_required
 def create_ad_view(request):
     if request.method == 'POST':
-        form = UserAdsForm(request.POST)
+        form = UserAdsForm(request.POST, request.FILES)  # include request.FILES
         if form.is_valid():
             ad = form.save(commit=False)
             ad.user = request.user
@@ -196,18 +197,22 @@ def create_ad_view(request):
         form = UserAdsForm()
     return render(request, 'create_ad.html', {'form': form})
 
+
+
 @login_required
 @profile_required
 def edit_ad_view(request, ad_id):
     ad = UserAds.objects.get(id=ad_id, user=request.user)
     if request.method == 'POST':
-        form = UserAdsForm(request.POST, instance=ad)
+        form = UserAdsForm(request.POST, request.FILES, instance=ad)  # include request.FILES
         if form.is_valid():
             form.save()
             return redirect('ads')
     else:
         form = UserAdsForm(instance=ad)
     return render(request, 'edit_ad.html', {'form': form})
+
+
 
 @login_required
 @profile_required
@@ -300,3 +305,28 @@ def ignore_reaction(request, reaction_id):
     reaction.reaction_received_status = 2
     reaction.save()
     return redirect('received_reactions')
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import AdReactions
+
+def handle_reaction_received(reaction):
+    # Send email to ad author
+    ad_author_email = reaction.user_ad.user.email
+    subject = 'You received a new reaction'
+    body = f'You received a new reaction to your ad "{reaction.user_ad.title}". The message is: "{reaction.reaction_text}".'
+    send_mail(subject, body, settings.EMAIL_HOST_USER, [ad_author_email])
+
+def handle_reaction_accepted(reaction):
+    # Send email to reaction author
+    reaction_author_email = reaction.reacted_user.email
+    subject = 'Your reaction was accepted'
+    body = f'Your reaction to the ad "{reaction.user_ad.title}" was accepted. Please contact the ad author using their preferred method of contact: {reaction.user_ad.user.userprofile.communication_preference.preference}.'
+    send_mail(subject, body, settings.EMAIL_HOST_USER, [reaction_author_email])
+
+
+# views.py
+def ad_detail_view(request, ad_id):
+    ad = UserAds.objects.get(id=ad_id)
+    return render(request, 'ad_detail.html', {'ad': ad})

@@ -13,6 +13,7 @@
             <p>Created at: {{ ad.created_at }}</p>
             <p>Ad text: {{ ad.ad_text }}</p>
             <p>Number of reactions: {{ ad.reactions.count }}</p>
+            <a href="{% url 'ad_detail' ad.id %}">Show more</a>
         </div>
         {% empty %}
         <p>No ads yet.</p>

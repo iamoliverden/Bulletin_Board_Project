@@ -4,10 +4,10 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .views import *
 
+
 router = DefaultRouter()
 router.register(r'userads', views.UserAdsViewSet, basename='userads_rest')
 router.register(r'adreactions', views.AdReactionsViewSet, basename='adreactions_rest')
-
 
 urlpatterns = [
     path('my_api', include(router.urls)),
@@ -15,7 +15,6 @@ urlpatterns = [
     path('non_registered/', views.landing_page_non_registered, name='landing_page_non_registered'),
     path('my_account/', views.my_account, name='my_account'),
     path('reactions/<int:ad_id>/', views.reactions, name='reactions'),
-    path('login/', views.login_view, name='login'),  # login view
     path('contact_us/', views.contact, name='contact_us'),
     path('create_profile/', UserProfileCreateView.as_view(), name='create_profile'),
     path('signup/', SignUpView.as_view(), name='signup'),
@@ -34,5 +33,6 @@ urlpatterns = [
     path('delete_reaction/<int:reaction_id>/', views.delete_reaction, name='delete_reaction'),
     path('accept_reaction/<int:reaction_id>/', views.accept_reaction, name='accept_reaction'),
     path('ignore_reaction/<int:reaction_id>/', views.ignore_reaction, name='ignore_reaction'),
+    path('ads/<int:ad_id>/', views.ad_detail_view, name='ad_detail'),
 
 ]
