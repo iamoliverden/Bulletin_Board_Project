@@ -1,8 +1,9 @@
 # forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-
+from ckeditor.widgets import CKEditorWidget
 from .models import *
+
 
 class UserSocialMediaForm(forms.ModelForm):
     class Meta:
@@ -29,9 +30,10 @@ class UserProfileForm(forms.ModelForm):
 
 
 class UserAdsForm(forms.ModelForm):
+    rich_text = forms.CharField(widget=CKEditorWidget())  # new field for the rich text content
     class Meta:
         model = UserAds
-        fields = ['ad_type', 'picture', 'video_link', 'ad_text', 'title']
+        fields = ['title', 'ad_text', 'rich_text', 'ad_type', 'picture', 'video_link']
 
     def __init__(self, *args, **kwargs):
         super(UserAdsForm, self).__init__(*args, **kwargs)

@@ -1,22 +1,25 @@
 # view.py
 from rest_framework import viewsets
 from .serializers import *
-from django.contrib.auth.forms import UserCreationForm
 from django.views import generic
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import UserProfile
 from .forms import UserProfileForm, CustomUserCreationForm
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import UserSocialMediaForm
 from functools import wraps
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+import random
+import datetime
+from django.contrib.auth import logout
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import AdReactions
+
+
 
 def profile_required(view_func):
     @wraps(view_func)
@@ -26,7 +29,9 @@ def profile_required(view_func):
         except UserProfile.DoesNotExist:
             return redirect('create_profile')  # or your profile creation view
         return view_func(request, *args, **kwargs)
+
     return wrapper
+
 
 # REST API Views
 @method_decorator(login_required(login_url=reverse_lazy('login')), name='dispatch')
@@ -35,11 +40,13 @@ class UserAdsViewSet(viewsets.ModelViewSet):
     queryset = UserAds.objects.all()
     serializer_class = UserAdsSerializer
 
+
 @method_decorator(login_required(login_url=reverse_lazy('login')), name='dispatch')
 @method_decorator(profile_required, name='dispatch')
 class AdReactionsViewSet(viewsets.ModelViewSet):
     queryset = AdReactions.objects.all()
     serializer_class = AdReactionsSerializer
+
 
 # Django Templates
 @login_required
@@ -69,10 +76,12 @@ def landing_page_registered(request):
 
     return render(request, 'landing.html', {'ads': ads, 'categories': categories})
 
+
 # Landing Page for Non-Registered Users
 def landing_page_non_registered(request):
     ads = UserAds.objects.all().order_by('-created_at')
     return render(request, '403.html', {'ads': ads})
+
 
 # Login Page
 def login_view(request):
@@ -81,16 +90,49 @@ def login_view(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            try:
-                UserProfile.objects.get(user=user)
-                return redirect('my_account')  # if profile exists, redirect to 'my_account'
-            except UserProfile.DoesNotExist:
-                return redirect('create_profile')  # if profile does not exist, redirect to 'create_profile'
+            # Generate one-time code and send it to user's email
+            code = str(random.randint(100000, 999999))
+            send_mail(
+                'Your one-time code',
+                f'Your one-time code is {code}',
+                settings.EMAIL_HOST_USER,  # sender email
+                [user.email],
+                fail_silently=False,
+            )
+            request.session['one_time_code'] = code
+            request.session['code_generation_time'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            request.session['user_id'] = user.id
+            return redirect('enter_one_time_code')
     return render(request, 'login.html')
+
+
+def enter_one_time_code(request):
+    if request.method == 'POST':
+        code = request.POST['code']
+        if code == request.session.get('one_time_code'):
+            code_generation_time = datetime.datetime.strptime(request.session.get('code_generation_time'), "%m/%d/%Y, %H:%M:%S")
+            if datetime.datetime.now() - code_generation_time < datetime.timedelta(minutes=2):
+                user = User.objects.get(id=request.session.get('user_id'))
+                # Specify the backend directly
+                backend = 'django.contrib.auth.backends.ModelBackend'
+                user.backend = backend
+                login(request, user)
+                try:
+                    UserProfile.objects.get(user=user)
+                    return redirect('my_account')  # if profile exists, redirect to 'my_account'
+                except UserProfile.DoesNotExist:
+                    return redirect('create_profile')  # if profile does not exist, redirect to 'create_profile'
+            else:
+                messages.error(request, 'The one-time code has expired. Please try again.')
+        else:
+            messages.error(request, 'The one-time code is incorrect. Please try again.')
+    return render(request, 'enter_one_time_code.html')
+
+
 
 def contact(request):
     return render(request, 'contact_us.html')
+
 
 @method_decorator(login_required(login_url=reverse_lazy('login')), name='dispatch')
 class UserProfileCreateView(CreateView):
@@ -121,10 +163,12 @@ class UserProfileCreateView(CreateView):
     def get_success_url(self):
         return reverse('my_account')
 
+
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')  # assuming 'login' is the name of your login view
     template_name = 'signup.html'
+
 
 # My Account Page
 @login_required
@@ -134,12 +178,14 @@ def my_account(request):
     my_ads = UserAds.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'my_account.html', {'user_profile': user_profile, 'my_ads': my_ads})
 
+
 # Reactions Page
 @login_required
 @profile_required
 def reactions(request, ad_id):
     reactions = AdReactions.objects.filter(user_ad__id=ad_id)
     return render(request, 'reactions.html', {'reactions': reactions})
+
 
 # Edit Profile Page
 @login_required
@@ -173,15 +219,27 @@ def delete_profile(request):
         return redirect('landing_page_non_registered')
     return render(request, 'delete_profile.html')
 
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import *
 
+
 @login_required
 @profile_required
 def ads_view(request):
+    category = request.GET.get('category', '')
+    date = request.GET.get('date', '')
     user_ads = UserAds.objects.filter(user=request.user)
-    return render(request, 'ads.html', {'user_ads': user_ads})
+    if category:
+        user_ads = user_ads.filter(ad_type__type_name=category)
+    if date:
+        user_ads = user_ads.filter(created_at__date=date)
+    user_ads = user_ads.order_by('-created_at')
+    categories = AdCategory.objects.all()
+    return render(request, 'ads.html', {'user_ads': user_ads, 'categories': categories})
+
+
 
 @login_required
 @profile_required
@@ -198,7 +256,6 @@ def create_ad_view(request):
     return render(request, 'create_ad.html', {'form': form})
 
 
-
 @login_required
 @profile_required
 def edit_ad_view(request, ad_id):
@@ -211,7 +268,6 @@ def edit_ad_view(request, ad_id):
     else:
         form = UserAdsForm(instance=ad)
     return render(request, 'edit_ad.html', {'form': form})
-
 
 
 @login_required
@@ -231,11 +287,13 @@ def received_reactions(request):
     reactions = AdReactions.objects.filter(user_ad__in=user_ads)
     return render(request, 'received_reactions.html', {'reactions': reactions})
 
+
 @login_required
 @profile_required
 def sent_reactions(request):
     reactions = AdReactions.objects.filter(reacted_user=request.user)
     return render(request, 'sent_reactions.html', {'reactions': reactions})
+
 
 @login_required
 @profile_required
@@ -250,9 +308,6 @@ def update_reaction(request, reaction_id):
     reaction.save()
     return redirect('received_reactions')
 
-
-# views.py
-from django.contrib.auth import logout
 
 def logout_view(request):
     logout(request)
@@ -276,10 +331,12 @@ def accept_ad(request, ad_id):
         form = AdReactionForm()
     return render(request, 'create_reaction.html', {'form': form, 'ad_id': ad_id})
 
+
 @login_required
 @profile_required
 def reject_ad(request, ad_id):
-    AdReactions.objects.create(user_ad=UserAds.objects.get(id=ad_id), reacted_user=request.user, accepted_status=False, rejected_status=True)
+    AdReactions.objects.create(user_ad=UserAds.objects.get(id=ad_id), reacted_user=request.user, accepted_status=False,
+                               rejected_status=True)
     return redirect('landing_page_registered')
 
 
@@ -290,6 +347,7 @@ def delete_reaction(request, reaction_id):
     reaction.delete()
     return redirect('sent_reactions')
 
+
 @login_required
 @profile_required
 def accept_reaction(request, reaction_id):
@@ -297,6 +355,7 @@ def accept_reaction(request, reaction_id):
     reaction.reaction_received_status = 1
     reaction.save()
     return redirect('received_reactions')
+
 
 @login_required
 @profile_required
@@ -307,16 +366,13 @@ def ignore_reaction(request, reaction_id):
     return redirect('received_reactions')
 
 
-from django.core.mail import send_mail
-from django.conf import settings
-from .models import AdReactions
-
 def handle_reaction_received(reaction):
     # Send email to ad author
     ad_author_email = reaction.user_ad.user.email
     subject = 'You received a new reaction'
     body = f'You received a new reaction to your ad "{reaction.user_ad.title}". The message is: "{reaction.reaction_text}".'
     send_mail(subject, body, settings.EMAIL_HOST_USER, [ad_author_email])
+
 
 def handle_reaction_accepted(reaction):
     # Send email to reaction author
@@ -326,7 +382,6 @@ def handle_reaction_accepted(reaction):
     send_mail(subject, body, settings.EMAIL_HOST_USER, [reaction_author_email])
 
 
-# views.py
 def ad_detail_view(request, ad_id):
     ad = UserAds.objects.get(id=ad_id)
     return render(request, 'ad_detail.html', {'ad': ad})

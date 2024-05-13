@@ -5,6 +5,9 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .utils import send_email_notification
+from ckeditor.fields import RichTextField
+
+
 
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
@@ -63,6 +66,8 @@ class UserAds(models.Model):
     video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
     ad_text = models.TextField(max_length=500, default='')
     title = models.CharField(max_length=200, default='')
+    rich_text = RichTextField(blank=True, null=True)  # new field for the rich text content
+
 
     def delete(self, *args, **kwargs):
         self.picture.delete(save=False)  # delete picture file

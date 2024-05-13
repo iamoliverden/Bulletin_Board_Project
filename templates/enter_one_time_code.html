@@ -1,0 +1,16 @@
+<!--enter_one_time_code.html-->
+{% extends "index.html" %}
+{% block content %}
+<main>
+    <h2>Enter One-Time Code</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="code">One-Time Code:</label><br>
+        <input type="text" id="code" name="code"><br>
+        <br>
+        <input type="submit" value="Submit">
+        <br>
+    </form>
+    <p>Didn't receive a code? <a href="{% url 'login' %}">Go back to login</a></p>
+</main>
+{% endblock %}

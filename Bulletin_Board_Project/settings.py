@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+#settings.py
 from pathlib import Path
 
 import os
@@ -54,7 +54,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     "django_apscheduler",
     'rest_framework',
-    'crispy_forms'
+    'crispy_forms',
+    'ckeditor',
+
 ]
 
 SITE_ID = 1
@@ -180,3 +182,15 @@ DEFAULT_FROM_EMAIL = f'{EmailPasswordYandex().my_email}'
 
 EMAIL_SUBJECT_PREFIX = '[Game Bulletin Board]'
 SERVER_EMAIL = f'{EmailPasswordYandex().my_email}'
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 300,
+        'removePlugins': 'stylesheetparser',
+        'extraPlugins': ','.join(['codesnippet',]),
+    },
+}
+

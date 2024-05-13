@@ -34,5 +34,7 @@ urlpatterns = [
     path('accept_reaction/<int:reaction_id>/', views.accept_reaction, name='accept_reaction'),
     path('ignore_reaction/<int:reaction_id>/', views.ignore_reaction, name='ignore_reaction'),
     path('ads/<int:ad_id>/', views.ad_detail_view, name='ad_detail'),
+    path('enter_one_time_code/', views.enter_one_time_code, name='enter_one_time_code'),
+
 
 ]
