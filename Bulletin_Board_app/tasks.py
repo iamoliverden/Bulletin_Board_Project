@@ -1,9 +1,13 @@
 from apscheduler.schedulers.background import BackgroundScheduler
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
+
 from .models import UserAds
+
 from datetime import datetime, timedelta
+
 
 def generate_digest_for_user(user):
     # Get the date one week ago
@@ -33,6 +37,7 @@ def send_weekly_digest():
             [user.email],
             fail_silently=False,
         )
+
 
 def start():
     scheduler = BackgroundScheduler()

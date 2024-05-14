@@ -19,7 +19,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+
 import Bulletin_Board_app.views as views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # replace 'your_app_name' with the name of your Django app

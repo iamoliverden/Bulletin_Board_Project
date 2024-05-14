@@ -8,6 +8,7 @@ class UserAdsSerializer(serializers.ModelSerializer):
         model = UserAds
         fields = '__all__'
 
+
 class AdReactionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdReactions

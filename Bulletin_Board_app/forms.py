@@ -10,6 +10,7 @@ class UserSocialMediaForm(forms.ModelForm):
         model = UserSocialMedia
         fields = ('social_media_key', 'handle')
 
+
 class UserProfileForm(forms.ModelForm):
     social_media_forms = forms.inlineformset_factory(UserProfile, UserSocialMedia, form=UserSocialMediaForm, extra=3)
     date_of_birth = forms.DateField(
@@ -26,11 +27,14 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('date_of_birth', 'mobile_number', 'country', 'favorite_game_genre', 'gaming_platform', 'privacy_consent', 'news_digest', 'biography', 'communication_preference', 'profile_picture')
+        fields = (
+            'date_of_birth', 'mobile_number', 'country', 'favorite_game_genre', 'gaming_platform', 'privacy_consent',
+            'news_digest', 'biography', 'communication_preference', 'profile_picture')
 
 
 class UserAdsForm(forms.ModelForm):
     rich_text = forms.CharField(widget=CKEditorWidget())  # new field for the rich text content
+
     class Meta:
         model = UserAds
         fields = ['title', 'ad_text', 'rich_text', 'ad_type', 'picture', 'video_link']
@@ -40,8 +44,6 @@ class UserAdsForm(forms.ModelForm):
         self.fields['ad_type'].queryset = AdCategory.objects.all()
 
 
-# forms.py
-...
 class AdReactionForm(forms.ModelForm):
     class Meta:
         model = AdReactions

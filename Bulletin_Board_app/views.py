@@ -1,24 +1,22 @@
 # view.py
-from rest_framework import viewsets
-from .serializers import *
-from django.views import generic
-from django.contrib.auth import authenticate, login
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
-from .models import UserProfile
-from .forms import UserProfileForm, CustomUserCreationForm
-from django.utils.decorators import method_decorator
-from django.contrib import messages
-from functools import wraps
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-import random
 import datetime
-from django.contrib.auth import logout
-from django.core.mail import send_mail
-from django.conf import settings
-from .models import AdReactions
+import random
 
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import generic
+from django.views.generic.edit import CreateView
+from functools import wraps
+from rest_framework import viewsets
+
+from .forms import *
+from .serializers import *
 
 
 def profile_required(view_func):
@@ -110,7 +108,8 @@ def enter_one_time_code(request):
     if request.method == 'POST':
         code = request.POST['code']
         if code == request.session.get('one_time_code'):
-            code_generation_time = datetime.datetime.strptime(request.session.get('code_generation_time'), "%m/%d/%Y, %H:%M:%S")
+            code_generation_time = datetime.datetime.strptime(request.session.get('code_generation_time'),
+                                                              "%m/%d/%Y, %H:%M:%S")
             if datetime.datetime.now() - code_generation_time < datetime.timedelta(minutes=2):
                 user = User.objects.get(id=request.session.get('user_id'))
                 # Specify the backend directly
@@ -127,7 +126,6 @@ def enter_one_time_code(request):
         else:
             messages.error(request, 'The one-time code is incorrect. Please try again.')
     return render(request, 'enter_one_time_code.html')
-
 
 
 def contact(request):
@@ -220,11 +218,6 @@ def delete_profile(request):
     return render(request, 'delete_profile.html')
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import *
-
-
 @login_required
 @profile_required
 def ads_view(request):
@@ -238,7 +231,6 @@ def ads_view(request):
     user_ads = user_ads.order_by('-created_at')
     categories = AdCategory.objects.all()
     return render(request, 'ads.html', {'user_ads': user_ads, 'categories': categories})
-
 
 
 @login_required

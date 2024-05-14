@@ -194,3 +194,7 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+ACCOUNT_EMAIL_UNIQUE = True # email must be unique
+ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True # email must be confirmed
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # direct email confirmation via a link
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1 # how many days the link is active

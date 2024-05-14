@@ -8,7 +8,6 @@ from .utils import send_email_notification
 from ckeditor.fields import RichTextField
 
 
-
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
     country_code = models.CharField(max_length=5)
@@ -16,11 +15,13 @@ class Country(models.Model):
     def __str__(self):
         return self.country_name
 
+
 class GameGenre(models.Model):
     genre_name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.genre_name
+
 
 class GamingPlatform(models.Model):
     platform_name = models.CharField(max_length=100)
@@ -34,6 +35,7 @@ class CommunicationPreference(models.Model):
 
     def __str__(self):
         return self.preference
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -52,26 +54,30 @@ class UserProfile(models.Model):
         self.profile_picture.delete(save=False)  # delete profile_picture file
         super().delete(*args, **kwargs)  # call the original delete method
 
+
 class AdCategory(models.Model):
     type_name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.type_name
 
+
 class UserAds(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ad_type = models.ForeignKey(AdCategory, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     picture = models.ImageField(upload_to='ad_pictures/', blank=True, null=True)  # new field for the picture
-    video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
+    # ?? video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
     ad_text = models.TextField(max_length=500, default='')
     title = models.CharField(max_length=200, default='')
     rich_text = RichTextField(blank=True, null=True)  # new field for the rich text content
 
+    # ?? media_file = models.FileField(upload_to='uploads_filefield/', blank=True, null=True)  # new field for the media file
 
     def delete(self, *args, **kwargs):
         self.picture.delete(save=False)  # delete picture file
         super().delete(*args, **kwargs)  # call the original delete method
+
 
 class AdReactions(models.Model):
     user_ad = models.ForeignKey(UserAds, on_delete=models.CASCADE)
@@ -88,6 +94,7 @@ class SocialMedia(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class UserSocialMedia(models.Model):
     profile_key = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
