@@ -3,9 +3,13 @@
 
 {% block content %}
   <h2>Edit Ad</h2>
-  <form method="POST" enctype="multipart/form-data"> <!-- Add enctype attribute -->
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    {{ formset.management_form }}
+    {% for media_form in formset %}
+      {{ media_form.as_p }}
+    {% endfor %}
     <button type="submit">Save changes</button>
   </form>
 {% endblock %}

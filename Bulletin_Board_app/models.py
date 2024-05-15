@@ -46,7 +46,7 @@ class UserProfile(models.Model):
     gaming_platform = models.ForeignKey(GamingPlatform, on_delete=models.CASCADE, null=True, blank=True)
     privacy_consent = models.BooleanField(default=False)
     news_digest = models.BooleanField(default=False)
-    biography = models.TextField(max_length=500, blank=True, null=True)
+    biography = RichTextField(blank=True, null=True, max_length=500)
     communication_preference = models.ForeignKey(CommunicationPreference, on_delete=models.CASCADE, default=1)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
@@ -66,17 +66,25 @@ class UserAds(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ad_type = models.ForeignKey(AdCategory, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
-    picture = models.ImageField(upload_to='ad_pictures/', blank=True, null=True)  # new field for the picture
-    # ?? video_link = models.URLField(max_length=200, blank=True, null=True)  # new field for the video link
-    ad_text = models.TextField(max_length=500, default='')
-    title = models.CharField(max_length=200, default='')
-    rich_text = RichTextField(blank=True, null=True)  # new field for the rich text content
-
-    # ?? media_file = models.FileField(upload_to='uploads_filefield/', blank=True, null=True)  # new field for the media file
+    ad_text = RichTextField(blank=True, null=True, max_length=500)
+    title = models.CharField(max_length=200, blank=False, null=False)
 
     def delete(self, *args, **kwargs):
-        self.picture.delete(save=False)  # delete picture file
+        for media_file in self.media_files.all():
+            # delete the file associated with the MediaFile instance
+            if media_file.media_file:
+                media_file.media_file.delete()
+            # delete the MediaFile instance
+            media_file.delete()
         super().delete(*args, **kwargs)  # call the original delete method
+
+
+class MediaFile(models.Model):
+    user_ad = models.ForeignKey(UserAds, related_name='media_files', on_delete=models.CASCADE)
+    media_file = models.FileField(upload_to='media_files/', blank=True, null=True)
+
+    def __str__(self):
+        return f'Media file for ad {self.user_ad.title}'
 
 
 class AdReactions(models.Model):

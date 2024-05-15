@@ -1,11 +1,16 @@
+<!--create_ad.html-->
 {% extends 'index.html' %}
 {% load static %}
 
 {% block content %}
   <h2>Create Ad</h2>
-  <form method="POST" enctype="multipart/form-data"> <!-- Add enctype attribute -->
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    {{ formset.management_form }}
+    {% for media_form in formset %}
+      {{ media_form.as_p }}
+    {% endfor %}
     <button type="submit">Create</button>
   </form>
 {% endblock %}

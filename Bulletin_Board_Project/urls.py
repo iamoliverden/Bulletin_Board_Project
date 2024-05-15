@@ -24,7 +24,8 @@ import Bulletin_Board_app.views as views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # replace 'your_app_name' with the name of your Django app
+    path('admin/', admin.site.urls),
     path('app/', include('Bulletin_Board_app.urls')),
-    path('login/', views.login_view, name='login'),  # login view
+    path('login/', views.login_view, name='login'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

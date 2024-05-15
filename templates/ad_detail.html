@@ -4,20 +4,18 @@
 
 {% block content %}
   <h2>{{ ad.title }}</h2>
-  <p>{{ ad.ad_text }}</p>
-  {% if ad.picture %}
-    <img src="{{ ad.picture.url }}" alt="Ad picture" width="100" height="100">
-    <br> <!-- This adds a line break (space) after the image -->
-    <br>
-  {% else %}
-    <p>No picture for this ad.</p>
-    <br>
-    <br>
-  {% endif %}
-  {% if ad.video_link %}
-    <a href="{{ ad.video_link }}">Watch video</a>
-  {% else %}
-    <p>No video for this ad.</p>
-  {% endif %}
+  <p>{{ ad.ad_text|safe }}</p>
+  {% for media_file in ad.media_files.all %}
+    {% if media_file.media_file %}
+      <img src="{{ media_file.media_file.url }}" alt="Media file" width="100" height="100">
+      <br>
+      <br>
+    {% else %}
+      <p>No media file for this ad.</p>
+      <br>
+      <br>
+    {% endif %}
+  {% empty %}
+    <p>No media files for this ad.</p>
+  {% endfor %}
 {% endblock %}
-

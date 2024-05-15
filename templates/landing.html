@@ -22,11 +22,12 @@
                     <p>Category: {{ ad.ad_type.type_name }}</p>
                     <p>Time added: {{ ad.created_at }}</p>
                     <p>Status: {{ ad.user_reaction_status }}</p>
+                    <p>Number of reactions: {{ ad.adreactions_set.count }}</p>
                 </div>
                 <div>
-                    <a href="{% url 'accept_ad' ad.id %}">Accept</a>
-                    <a href="{% url 'reject_ad' ad.id %}">Reject</a>
-                    <a href="{% url 'ad_detail' ad.id %}">Show more</a>
+                    <a href="{% url 'accept_ad' ad.id %}">Send Reaction</a>
+                    <a href="{% url 'reject_ad' ad.id %}">Withdraw Reaction</a>
+                    <a href="{% url 'ad_detail' ad.id %}">Show full ad</a>
                 </div>
             </div>
         </li>

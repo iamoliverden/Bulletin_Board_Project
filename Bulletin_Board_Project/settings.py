@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'ckeditor',
+    'ckeditor_uploader',
 
 ]
 
@@ -188,13 +189,28 @@ CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
         'height': 300,
-        'width': 300,
+        'width': 600,
         'removePlugins': 'stylesheetparser',
         'extraPlugins': ','.join(['codesnippet',]),
     },
 }
 
-ACCOUNT_EMAIL_UNIQUE = True # email must be unique
-ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True # email must be confirmed
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # direct email confirmation via a link
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1 # how many days the link is active
+ACCOUNT_EMAIL_UNIQUE = True
+ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 300,
+        'removePlugins': 'stylesheetparser',
+        'extraPlugins': ','.join(['codesnippet', 'uploadimage', 'uploadwidget', 'filetools', 'widget', 'dialog', 'clipboard']),
+    },
+}
+
+
+CKEDITOR_UPLOAD_PATH = "media/rich_text_uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"

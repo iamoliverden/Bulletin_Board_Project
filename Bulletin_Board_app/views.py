@@ -12,6 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.generic.edit import CreateView
+from django.forms import modelformset_factory
 from functools import wraps
 from rest_framework import viewsets
 
@@ -62,13 +63,13 @@ def landing_page_registered(request):
 
     # Add reaction statuses to each ad
     for ad in ads:
-        ad.user_reaction_status = 'Pending'
+        ad.user_reaction_status = 'No Reaction'
         try:
             reaction = AdReactions.objects.filter(user_ad=ad, reacted_user=request.user).latest('reaction_time')
             if reaction.accepted_status == 1:
-                ad.user_reaction_status = 'Accepted'
+                ad.user_reaction_status = 'Reaction Sent'
             elif reaction.rejected_status == 1:
-                ad.user_reaction_status = 'Rejected'
+                ad.user_reaction_status = 'Reaction Withdrawn'
         except AdReactions.DoesNotExist:
             pass
 
@@ -78,7 +79,7 @@ def landing_page_registered(request):
 # Landing Page for Non-Registered Users
 def landing_page_non_registered(request):
     ads = UserAds.objects.all().order_by('-created_at')
-    return render(request, '403.html', {'ads': ads})
+    return render(request, 'landing_page_non_registered.html', {'ads': ads})
 
 
 # Login Page
@@ -236,30 +237,44 @@ def ads_view(request):
 @login_required
 @profile_required
 def create_ad_view(request):
+    MediaFileFormSet = modelformset_factory(MediaFile, form=MediaFileForm, extra=3)
     if request.method == 'POST':
-        form = UserAdsForm(request.POST, request.FILES)  # include request.FILES
-        if form.is_valid():
+        form = UserAdsForm(request.POST, request.FILES)
+        formset = MediaFileFormSet(request.POST, request.FILES, queryset=MediaFile.objects.none())
+        if form.is_valid() and formset.is_valid():
             ad = form.save(commit=False)
             ad.user = request.user
             ad.save()
+            for media_form in formset:
+                media_file = media_form.save(commit=False)
+                media_file.user_ad = ad
+                media_file.save()
             return redirect('ads')
     else:
         form = UserAdsForm()
-    return render(request, 'create_ad.html', {'form': form})
+        formset = MediaFileFormSet(queryset=MediaFile.objects.none())
+    return render(request, 'create_ad.html', {'form': form, 'formset': formset})
 
 
 @login_required
 @profile_required
 def edit_ad_view(request, ad_id):
     ad = UserAds.objects.get(id=ad_id, user=request.user)
+    MediaFileFormSet = modelformset_factory(MediaFile, form=MediaFileForm, extra=3, max_num=3)
     if request.method == 'POST':
         form = UserAdsForm(request.POST, request.FILES, instance=ad)  # include request.FILES
-        if form.is_valid():
+        formset = MediaFileFormSet(request.POST, request.FILES, queryset=MediaFile.objects.filter(user_ad=ad))
+        if form.is_valid() and formset.is_valid():
             form.save()
+            for media_form in formset:
+                media_file = media_form.save(commit=False)
+                media_file.user_ad = ad
+                media_file.save()
             return redirect('ads')
     else:
         form = UserAdsForm(instance=ad)
-    return render(request, 'edit_ad.html', {'form': form})
+        formset = MediaFileFormSet(queryset=MediaFile.objects.filter(user_ad=ad))
+    return render(request, 'edit_ad.html', {'form': form, 'formset': formset})
 
 
 @login_required

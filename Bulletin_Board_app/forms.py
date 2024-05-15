@@ -33,11 +33,10 @@ class UserProfileForm(forms.ModelForm):
 
 
 class UserAdsForm(forms.ModelForm):
-    rich_text = forms.CharField(widget=CKEditorWidget())  # new field for the rich text content
 
     class Meta:
         model = UserAds
-        fields = ['title', 'ad_text', 'rich_text', 'ad_type', 'picture', 'video_link']
+        fields = ['title', 'ad_text', 'ad_type', ]
 
     def __init__(self, *args, **kwargs):
         super(UserAdsForm, self).__init__(*args, **kwargs)
@@ -63,3 +62,9 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class MediaFileForm(forms.ModelForm):
+    class Meta:
+        model = MediaFile
+        fields = ('media_file',)
